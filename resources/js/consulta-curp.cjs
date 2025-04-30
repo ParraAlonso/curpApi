@@ -8,7 +8,7 @@ const curp = process.argv[2];
 
     const browser = await chromium.launch({
         headless: isLinuxServer,
-        executablePath: isLinuxServer ? '/usr/bin/chromium-browser' : 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        executablePath: isLinuxServer ? '/usr/bin/google-chrome' : 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -29,7 +29,7 @@ const curp = process.argv[2];
     await page.locator('#searchButton').click();
 
     try {
-        await page.waitForSelector('.results', { timeout: 2000 });
+        await page.waitForSelector('.results', { timeout: 3000 });
 
         const resultado = await page.locator('.results').innerText();
 
