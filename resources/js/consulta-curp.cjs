@@ -20,7 +20,7 @@ const curp = process.argv[2];
 
     const page = await browser.newPage();
 
-    await page.goto('https://www.gob.mx/curp/', { waitUntil: 'networkidle' });
+    await page.goto('https://www.gob.mx/curp/', { waitUntil: 'domcontentloaded' });
 
     await page.locator('#curpinput').fill(curp);
 
