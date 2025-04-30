@@ -24,9 +24,21 @@ const curp = process.argv[2];
 
     await page.goto('https://www.gob.mx/curp/', { waitUntil: 'networkidle' });
 
-    await page.locator('#curpinput').fill(curp);
+    const input = page.locator('#curpinput');
 
-    await page.locator('#searchButton').click();
+    if(isLinuxServer){
+        await input.waitFor({ state: 'visible', timeout: 8000 });
+    }
+
+    await input.fill(curp);
+
+    const boton = page.locator('#searchButton');
+
+    if(isLinuxServer) {
+        await boton.waitFor({state: 'visible', timeout: 3000});
+    }
+
+    await boton.click();
 
     try {
         await page.waitForSelector('.results', { timeout: 3000 });
