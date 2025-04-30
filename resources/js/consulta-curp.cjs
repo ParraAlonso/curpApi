@@ -13,10 +13,8 @@ const curp = process.argv[2];
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--no-first-run',
-            '--no-zygote',
-            '--disable-gpu'
+            '--disable-gpu',
+            '--no-first-run'
         ]
     });
 
@@ -24,21 +22,9 @@ const curp = process.argv[2];
 
     await page.goto('https://www.gob.mx/curp/', { waitUntil: 'networkidle' });
 
-    const input = page.locator('#curpinput');
+    await page.locator('#curpinput').fill(curp);
 
-    if(isLinuxServer){
-        await input.waitFor({ state: 'visible', timeout: 8000 });
-    }
-
-    await input.fill(curp);
-
-    const boton = page.locator('#searchButton');
-
-    if(isLinuxServer) {
-        await boton.waitFor({state: 'visible', timeout: 3000});
-    }
-
-    await boton.click();
+    await page.locator('#searchButton').click();
 
     try {
         await page.waitForSelector('.results', { timeout: 3000 });
