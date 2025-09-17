@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Services\CurpService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
+use App\Models\Curp;
 
 class CurpController extends Controller
 {
@@ -34,7 +36,7 @@ class CurpController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $resultado
+                'data' => json_decode(json_decode($resultado->datos))
             ]);
 
         } catch (\Exception $e) {
@@ -45,5 +47,30 @@ class CurpController extends Controller
             ], 400);
 
         }
+    }
+
+    /**
+     * Descarga PDF del CURP
+     */
+    function downloadCurp(Request $request) {
+        $curp = trim($request->input('curp'));
+        $data = Curp::whereCurp($curp)->firstOrFail();
+
+        $datos = json_decode(json_decode($data->datos));
+        if(property_exists($datos->registros[0],'parametro') && $datos->registros[0]->parametro != null){
+            $url = 'https://consultas.curp.gob.mx/CurpSP/pdfgobmx' . $datos->registros[0]->parametro;
+            $base64 = file_get_contents($url);
+            $response = Response::make(base64_decode($base64), 200);
+            $response->header('Content-Type', 'application/pdf');
+            $response->header('Content-Disposition', 'attachment; filename="'.$curp.'.pdf"');
+            return $response;
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'El registro no tiene los datos necesarios para su descarga.'
+            ], 400);
+
+        }
+        
     }
 }

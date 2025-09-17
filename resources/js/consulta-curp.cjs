@@ -1,9 +1,9 @@
 const { chromium } = require('playwright');
 const os = require('os');
+const { json } = require('stream/consumers');
 const curp = process.argv[2];
 
 (async () => {
-
     const isLinuxServer = os.platform() === 'linux' && !process.env.DISPLAY;
 
     const browser = await chromium.launch({
@@ -29,11 +29,10 @@ const curp = process.argv[2];
     await page.locator('#searchButton').click();
 
     try {
-        await page.waitForSelector('.results', { timeout: 3000 });
 
-        const resultado = await page.locator('.results').innerText();
-
-        console.log(resultado);
+        const response = await page.waitForResponse(response => response.url().includes('/v1/renapoCURP/consulta'),{ timeout:500 });
+        const data = await response.json();
+        console.log(JSON.stringify(data));
 
     } catch (error) {
 
