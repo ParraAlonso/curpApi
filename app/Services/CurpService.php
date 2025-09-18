@@ -31,48 +31,11 @@ class CurpService
         }
 
         $output = $process->getOutput();
-
-        $lineas = explode("\n", $output);
-
-        $datos = [];
-
-        $empezar = false;
-
-        foreach ($lineas as $linea) {
-
-            $linea = trim($linea);
-
-            if (str_starts_with($linea, 'CURP:')) {
-
-                $empezar = true;
-
-            }
-
-            if ($empezar) {
-
-                if (strpos($linea, ':') !== false) {
-
-                    [$campo, $valor] = explode(':', $linea, 2);
-
-                    $datos[Str::slug($campo,'')] = trim($valor);
-
-                }
-
-                if (str_starts_with($linea, 'Municipio de registro')) {
-
-                    break;
-
-                }
-
-            }
-
-        }
-
         return Curp::updateOrCreate(
             ['curp' => $curp],
             [
                 'curp' => $curp,
-                'datos' => json_encode($datos)
+                'datos' => json_encode($output),
             ]
         );
     }
